@@ -15,6 +15,10 @@ extend  Traject::Macros::Marc21Semantics
 require 'traject/macros/marc_format_classifier'
 extend Traject::Macros::MarcFormats
 
+# Copied from https://github.com/projectblacklight/blacklight-marc/blob/master/lib/blacklight/marc/indexer.rb#L18-L19
+ATOZ = ('a'..'z').to_a.join('')
+ATOU = ('a'..'u').to_a.join('')
+
 settings do
   # type may be 'binary', 'xml', or 'json'
   provide "marc_source.type", "binary"
@@ -22,9 +26,10 @@ settings do
   provide 'solr_writer.max_skipped', -1
   # extend commit timeout
   provide 'solr_writer.commit_timeout', 30
+  provide 'solr.update_url', 'http://localhost:8983/solr/traject-core/update'
+
 end
 
-#to_field 'id', trim(extract_marc("001"), :first => true)
 to_field("id") do |rec, acc|
   if (rec['001'])
     id = rec['001'].value
@@ -33,20 +38,20 @@ to_field("id") do |rec, acc|
   end
   acc << id
 end
-to_field 'marc_display', get_xml
+#to_field 'marc_display', get_xml
 to_field "text", extract_all_marc_values do |r, acc|
   acc.replace [acc.join(' ')] # turn it into a single string
 end
  
 to_field "language_facet", marc_languages("008[35-37]:041a:041d:")
-to_field "format", get_format
-to_field "isbn_t",  extract_marc('020a', :separator=>nil) do |rec, acc|
-     orig = acc.dup
-     acc.map!{|x| StdNum::ISBN.allNormalizedValues(x)}
-     acc << orig
-     acc.flatten!
-     acc.uniq!
-end
+#to_field "format", get_format
+#to_field "isbn_t",  extract_marc('020a', :separator=>nil) do |rec, acc|
+#     orig = acc.dup
+#     acc.map!{|x| StdNum::ISBN.allNormalizedValues(x)}
+#     acc << orig
+#     acc.flatten!
+#     acc.uniq!
+#end
  
 to_field 'material_type_display', extract_marc('300a', :trim_punctuation => true)
  
@@ -121,10 +126,10 @@ to_field 'pub_date', marc_publication_date
  
 # Call Number fields
 to_field 'lc_callnum_display', extract_marc('050ab', :first => true)
-to_field 'lc_1letter_facet', extract_marc('050ab', :first=>true, :translation_map=>'callnumber_map') do |rec, acc|
-  # Just get the first letter to send to the translation map
-  acc.map!{|x| x[0]}
-end
+#to_field 'lc_1letter_facet', extract_marc('050ab', :first=>true, :translation_map=>'callnumber_map') do |rec, acc|
+#  # Just get the first letter to send to the translation map
+#  acc.map!{|x| x[0]}
+#end
 
 alpha_pat = /\A([A-Z]{1,3})\d.*\Z/
 to_field 'lc_alpha_facet', extract_marc('050a', :first=>true) do |rec, acc|
