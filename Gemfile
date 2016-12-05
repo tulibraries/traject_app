@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+gem 'traject'
+gem 'solr_wrapper'
+gem 'blacklight'
+gem 'blacklight-marc'
+gem 'pry'
