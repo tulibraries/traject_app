@@ -6,7 +6,7 @@ Stand alone traject app based on [traject/traject](https://github.com/traject/tr
 To execute
 
 ```bash
-git clone https://github.com/skng5/traject_app.git
+git clone https://github.com/tulibraries/traject_app.git
 cd traject_app
 bundle install
 solr_wrapper &
